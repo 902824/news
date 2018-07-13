@@ -1,0 +1,8 @@
+welcome: Welcome to Memory Game
+
+
+round: Can you repeat the numbers {{ numbers|join(", ") }} 
+
+win: Good job my king we knew you could get it!
+
+lose: hey brayn watch out for python
