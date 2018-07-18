@@ -13,7 +13,7 @@ logging.getLogger("flask_ask").setLevel(logging.DEBUG)
 
 @ask.launch
 def new_feed():
-    welcome_msg = render_template('welcome')+render_template('task')
+    welcome_msg = render_template('task')
     return question(welcome_msg)
 
 

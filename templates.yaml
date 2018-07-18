@@ -1,4 +1,4 @@
-welcome: What topic do you want to hear about?
+task: What topic do you want to hear about?
 
 five: Here are the top five headlines. {{ headlines|join(", ") }} Which number do you want me to read?
 
