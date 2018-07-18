@@ -1,8 +1,7 @@
-welcome: Welcome to Memory Game
+welcome: What topic do you want to hear about?
 
+five: Here are the top five headlines. {{ headlines|join(", ") }} Which number do you want me to read?
 
-round: Can you repeat the numbers {{ numbers|join(", ") }} 
+none: There are no headlines that match.
 
-win: Good job my king we knew you could get it!
-
-lose: hey brayn watch out for python
+article: Here is the article. {{ text }}
