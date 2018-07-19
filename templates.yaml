@@ -5,3 +5,6 @@ five: Here are the top five headlines. {{ headlines|join(", ") }} Which number d
 none: There are no headlines that match.
 
 article: Here is the article. {{ text }}
+
+thankYou: Thank you 
+
