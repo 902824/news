@@ -52,9 +52,9 @@ def read_article(number):
     '''
     feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml')
     if(number == 1):
-        feeds = feed.entries[1].published
+        feeds = feed.entries[1].summary
     else:
-        feeds = feed.entries[2].published
+        feeds = feed.entries[2].summary
     msg = format(feeds)
     return question(msg)
 
