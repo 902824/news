@@ -35,13 +35,30 @@ def read_hlines():
     else:
         headline_msg = render_template('none')
     '''
-    new=" here is the top headlines, 1, {}, 2, {}, what number do you want to hear about?"
+    new=" here is the top headlines, 1, {}, 2, {}, what do you want to hear about?"
     
     msg = new.format( news1, news2)
     return question(msg)
+def cutWord(sentence):
+    fillers = ["um", "uh", "like", "hi", "hey", "hello", "oh"]
+    pronouns = ["i", "we", "you", "he", "she", "it", "they", "his", "her", "their", "my", "our", "your", "me", "us", "him", "her", "them"]
+    determiners = ["a", "and", "the", "this", "that", "these", "those"]
+    verbs = ["to be", "am", "are", "is"]
+    for word in list(sentence): 
+        if word in fillers:
+            sentence.remove(word)
+    for word in list(sentence): 
+        if word in pronouns:
+            sentence.remove(word)
+    for word in list(sentence): 
+        if word in determiners:
+            sentence.remove(word)
+    for word in list(sentence): 
+        if word in verbs:
+            sentence.remove(word)
+    return sentence
 
-
-@ask.intent("AnswerIntent", convert={'number': int})
+@ask.intent("AnswerIntent", convert={'number': str})
 def read_article(number):
     '''
     winning_article = session.attributes['headlines'][number]
