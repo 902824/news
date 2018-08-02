@@ -21,7 +21,10 @@ def new_feed():
 @ask.intent("AMAZON.StopIntent")
 def stop():
     return statement("okay")
-
+    
+def rng(num1, num2):#random number generator just because i wanted it
+    return random.randint(num1,num2)
+    
 @ask.intent("TopicIntent", convert={'topicResponse': str})
 def read_hlines(topicResponse):
     word = ""
@@ -33,27 +36,33 @@ def read_hlines(topicResponse):
             session.attributes['nameTopic'] = camelcase(word)
         elif (topicResponse.lower() == "nfl"):
             session.attributes['nameTopic'] = camelcase("football")
+        elif (topicResponse.lower() == "tv"):
+            session.attributes['nameTopic'] = camelcase("Television")
         elif (topicResponse.lower() == "nba" or topicResponse.lower() == "n yeah"):
             session.attributes['nameTopic'] = camelcase("Pro Basketball")
         elif (topicResponse.lower() == "news"):
-            ran = random.randint(0,14)
-            articles = ["World", "Africa", "Americas", "Politics", "Sports", "Space", "Movies", "Travel", "Golf", "Baseball", "Soccer", "Science", "Education", "Technology"]
-            session.attributes['nameTopic'] = camelcase(articles[ran])
-        
+            session.attributes['nameTopic'] = "HomePage"
         else:
             session.attributes['nameTopic'] = camelcase(topicResponse)
         
         try:
             feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/' + session.attributes['nameTopic'] + '.xml')
             news1 = feed.entries[1].title
-            #print(session.attributes['state']+ "try")
+            
         except:
-            session.attributes['state'] == 0
-            new = "Sorry, {} is not an option"
-            
-            #print(session.attributes['state'])
-            
-            msg = new.format(session.attributes['nameTopic'])
+            articals = ["World", "Africa", "Americas", "Asia Pacific", "Europe", "Middle East", "US", "Education", "Politics", "Business",
+            "Small Business", "Economy", "Technology", "Sports", "Baseball", "Basketball", "Football", "Golf", "Hockey", "College Basketball",
+            "College Football", "Soccer", "Tennis", "Science", "Environment", "Space", "Health", "Arts", "Books", "Dance", "Movies",
+            "Music", "Television", "Theater", "Travel"]
+            num1 = rng(0, 34)
+            num2 = rng(0, 34)
+            while num2 == num1:
+                num2 = rng(0, 34)
+            session.attributes['state'] = 0
+            news1 = articals[num1]
+            news2 = articals[num2]
+            new = "Sorry, {} is not an option, but you can try something like, {}, or, {}"
+            msg = new.format(session.attributes['nameTopic'], news1, news2)
             return question(msg)
         feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/' + session.attributes['nameTopic'] + '.xml')
                 
@@ -63,17 +72,22 @@ def read_hlines(topicResponse):
         new = " here's the top headlines for {},,1,. {},. 2,,, {}, and, 3, {},. what number do you want to hear about?"
         msg = new.format(session.attributes['nameTopic'], news1, news2, news3)
         return question(msg)
-    if (session.attributes['state'] == 2):
+    elif (session.attributes['state'] == 2):
         msg = read_article(topicResponse)
-        return statement(msg)
-    if (session.attributes['state'] == 3):
-        msg = "Thank you"
-        return statement(msg)
+        return question(msg)
+    elif (session.attributes['state'] == 3):
+        msg = ", would you like to hear about another topic?"
+        if topicResponse.lower() == "yes":
+            session.attributes['state'] = 0
+            return question("okay, what would you like to hear about?")
+        else:
+            msg = "Thank you"
+            return statement(msg)
         
 
             
 def cutWord(sentence):
-    fillers = ["um", "uh", "like", "hi", "hey", "hello", "oh"]
+    fillers = ["um", "uh", "like", "hi", "hey", "hello", "oh", "ok", "okay"]
     pronouns = ["i", "we", "you", "he", "she", "it", "they", "his", "her", "their", "my", "our", "your", "me", "us", "him", "her", "them"]
     determiners = ["a", "and", "the", "this", "that", "these", "those", "an"]
     verbs = ["to be", "am", "are", "is"]
@@ -118,9 +132,9 @@ def read_article(number):
         
     msg = format(feeds)
     blank = msg.strip()
-    if(len(blank) < 2):
-        return "Sorry, there was no summary"
-    return ","+msg
+    if(len(blank) < 13):
+        return "Sorry, there was no summary, would you like to hear about another topic?"
+    return ","+msg + ", would you like to hear about another topic?"
 
 if __name__ == '__main__':
     app.run(debug=True)
