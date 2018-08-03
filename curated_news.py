@@ -40,7 +40,7 @@ def read_hlines(topicResponse):
             session.attributes['nameTopic'] = camelcase("Television")
         elif (topicResponse.lower() == "nba" or topicResponse.lower() == "n yeah"):
             session.attributes['nameTopic'] = camelcase("Pro Basketball")
-        elif (topicResponse.lower() == "news"):
+        elif (topicResponse.lower() == "news" or "any" in topicResponse.lower()):
             session.attributes['nameTopic'] = "HomePage"
         else:
             session.attributes['nameTopic'] = camelcase(topicResponse)
@@ -81,7 +81,7 @@ def read_hlines(topicResponse):
             session.attributes['state'] = 0
             return question("okay, what would you like to hear about?")
         else:
-            msg = "Thank you"
+            msg = "Thank you, goodbye"
             return statement(msg)
         
 
@@ -92,16 +92,16 @@ def cutWord(sentence):
     determiners = ["a", "and", "the", "this", "that", "these", "those", "an"]
     verbs = ["to be", "am", "are", "is"]
     for word in list(sentence): 
-        if word in fillers:
+        if word.lower() in fillers:
             sentence.remove(word)
     for word in list(sentence): 
-        if word in pronouns:
+        if word.lower() in pronouns:
             sentence.remove(word)
     for word in list(sentence): 
-        if word in determiners:
+        if word.lower() in determiners:
             sentence.remove(word)
     for word in list(sentence): 
-        if word in verbs:
+        if word.lower() in verbs:
             sentence.remove(word)
     return sentence
     
