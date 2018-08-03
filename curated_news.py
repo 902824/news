@@ -24,9 +24,23 @@ def stop():
     
 def rng(num1, num2):#random number generator just because i wanted it
     return random.randint(num1,num2)
-    
+
+def readArticles(article):
+        feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/' + session.attributes['nameTopic'] + '.xml')
+                
+        news1 = feed.entries[1].title
+        news2 = feed.entries[2].title
+        news3 = feed.entries[3].title
+        new = " here's the top headlines for {},,1,. {},. 2,,, {}, and, 3, {},. what number do you want to hear about?"
+        msg = new.format(session.attributes['nameTopic'], news1, news2, news3)
+        return (msg)
+
 @ask.intent("TopicIntent", convert={'topicResponse': str})
 def read_hlines(topicResponse):
+    articalsForListen = ["World", "Africa", "Americas", "Asia Pacific", "Europe", "Middle East", "US", "Education", "Politics", "Business",
+    "Small Business", "Economy", "Technology", "Sports", "Baseball", "Golf", "Hockey", 
+    "Soccer", "Tennis", "Science", "Environment", "Space", "Health", "Arts", "Books", "Dance", "Movies",
+    "Music", "Television", "Theater", "Travel", "College Basketball"]
     word = ""
     session.attributes['state'] += 1
     if (session.attributes['state'] == 1):
@@ -43,8 +57,35 @@ def read_hlines(topicResponse):
         elif (topicResponse.lower() == "news" or "any" in topicResponse.lower()):
             session.attributes['nameTopic'] = "HomePage"
         else:
-            session.attributes['nameTopic'] = camelcase(topicResponse)
+            d = 0
+            for i in range(len(articalsForListen)):
+                if articalsForListen[d].lower() in topicResponse.lower():
+                    session.attributes['nameTopic'] = camelcase(articalsForListen[i])
+                    feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/' + camelcase(articalsForListen[i]) + '.xml')
+                    pass
+                d += 1
         
+        try:
+            feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/' + session.attributes['nameTopic'] + '.xml')
+            news1 = feed.entries[1].title
+            
+        except:
+            articals = ["World", "Africa", "Americas", "Asia Pacific", "Europe", "Middle East", "US", "Education", "Politics", "Business",
+            "Small Business", "Economy", "Technology", "Sports", "Baseball", "Basketball", "Football", "Golf", "Hockey", "College Basketball",
+            "College Football", "Soccer", "Tennis", "Science", "Environment", "Space", "Health", "Arts", "Books", "Dance", "Movies",
+            "Music", "Television", "Theater", "Travel"]
+            num1 = rng(0, 34)
+            num2 = rng(0, 34)
+            while num2 == num1:
+                num2 = rng(0, 34)
+            session.attributes['state'] = 0
+            news1 = articals[num1]
+            news2 = articals[num2]
+            session.attributes['nameTopic'] = topicResponse
+            new = "Sorry, {} is not an option, but you can try something like, {}, or, {}"
+            msg = new.format(session.attributes['nameTopic'], news1, news2)
+            return question(msg)
+        """
         try:
             feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/' + session.attributes['nameTopic'] + '.xml')
             news1 = feed.entries[1].title
@@ -64,6 +105,7 @@ def read_hlines(topicResponse):
             new = "Sorry, {} is not an option, but you can try something like, {}, or, {}"
             msg = new.format(session.attributes['nameTopic'], news1, news2)
             return question(msg)
+        """
         feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/' + session.attributes['nameTopic'] + '.xml')
                 
         news1 = feed.entries[1].title
@@ -72,12 +114,13 @@ def read_hlines(topicResponse):
         new = " here's the top headlines for {},,1,. {},. 2,,, {}, and, 3, {},. what number do you want to hear about?"
         msg = new.format(session.attributes['nameTopic'], news1, news2, news3)
         return question(msg)
+    
     elif (session.attributes['state'] == 2):
         msg = read_article(topicResponse)
         return question(msg)
     elif (session.attributes['state'] == 3):
         msg = ", would you like to hear about another topic?"
-        if topicResponse.lower() == "yes":
+        if "yes" in topicResponse.lower() or "sure" in topicResponse.lower() or "why not" in topicResponse.lower():
             session.attributes['state'] = 0
             return question("okay, what would you like to hear about?")
         else:
@@ -113,13 +156,9 @@ def camelcase(s):
     return title
 
 def read_article(number):
-    '''
-    winning_article = session.attributes['headlines'][number]
-    access RSS feed and go to url of article
-    store article in variable "text"
-    article_msg = render_template('article', text=text)
-    return statement(article_msg)
-    '''
+
+    oldTopic = session.attributes['nameTopic']
+    
     feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/' + session.attributes['nameTopic'] + '.xml')
     if(number.lower() == "one" or number == "1" or "first" in number.lower() or "1" in number.lower()):
         feeds = feed.entries[1].summary
