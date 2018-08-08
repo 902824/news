@@ -33,14 +33,14 @@ def readArticles(article):
         news3 = feed.entries[3].title
         new = " here's the top headlines for {},,1,. {},. 2,,, {}, and, 3, {},. what number do you want to hear about?"
         msg = new.format(session.attributes['nameTopic'], news1, news2, news3)
-        return (msg)
+        return question(msg)
 
 @ask.intent("TopicIntent", convert={'topicResponse': str})
 def read_hlines(topicResponse):
     articalsForListen = ["World", "Africa", "Americas", "Asia Pacific", "Europe", "Middle East", "US", "Education", "Politics", "Business",
     "Small Business", "Economy", "Technology", "Sports", "Baseball", "Golf", "Hockey", 
     "Soccer", "Tennis", "Science", "Environment", "Space", "Health", "Arts", "Books", "Dance", "Movies",
-    "Music", "Television", "Theater", "Travel", "College Basketball"]
+    "Music", "Television", "Theater", "Travel", "College Basketball", "College Football"]
     word = ""
     session.attributes['state'] += 1
     if (session.attributes['state'] == 1):
@@ -49,7 +49,7 @@ def read_hlines(topicResponse):
             word = "Pro "+topicResponse
             session.attributes['nameTopic'] = camelcase(word)
         elif (topicResponse.lower() == "nfl"):
-            session.attributes['nameTopic'] = camelcase("football")
+            session.attributes['nameTopic'] = camelcase("Pro football")
         elif (topicResponse.lower() == "tv"):
             session.attributes['nameTopic'] = camelcase("Television")
         elif (topicResponse.lower() == "nba" or topicResponse.lower() == "n yeah"):
@@ -85,27 +85,7 @@ def read_hlines(topicResponse):
             new = "Sorry, {} is not an option, but you can try something like, {}, or, {}"
             msg = new.format(session.attributes['nameTopic'], news1, news2)
             return question(msg)
-        """
-        try:
-            feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/' + session.attributes['nameTopic'] + '.xml')
-            news1 = feed.entries[1].title
-            
-        except:
-            articals = ["World", "Africa", "Americas", "Asia Pacific", "Europe", "Middle East", "US", "Education", "Politics", "Business",
-            "Small Business", "Economy", "Technology", "Sports", "Baseball", "Basketball", "Football", "Golf", "Hockey", "College Basketball",
-            "College Football", "Soccer", "Tennis", "Science", "Environment", "Space", "Health", "Arts", "Books", "Dance", "Movies",
-            "Music", "Television", "Theater", "Travel"]
-            num1 = rng(0, 34)
-            num2 = rng(0, 34)
-            while num2 == num1:
-                num2 = rng(0, 34)
-            session.attributes['state'] = 0
-            news1 = articals[num1]
-            news2 = articals[num2]
-            new = "Sorry, {} is not an option, but you can try something like, {}, or, {}"
-            msg = new.format(session.attributes['nameTopic'], news1, news2)
-            return question(msg)
-        """
+        
         feed = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/' + session.attributes['nameTopic'] + '.xml')
                 
         news1 = feed.entries[1].title
@@ -119,15 +99,18 @@ def read_hlines(topicResponse):
         msg = read_article(topicResponse)
         return question(msg)
     elif (session.attributes['state'] == 3):
-        msg = ", would you like to hear about another topic?"
-        if "yes" in topicResponse.lower() or "sure" in topicResponse.lower() or "why not" in topicResponse.lower():
-            session.attributes['state'] = 0
-            return question("okay, what would you like to hear about?")
-        else:
-            msg = "Thank you, goodbye"
-            return statement(msg)
         
-
+        
+        if "yes" in topicResponse.lower() or "sure" in topicResponse.lower() or "why not" in topicResponse.lower() or "ok" in topicResponse.lower() or "ye" in topicResponse.lower():
+            session.attributes['state'] = 0
+            return question("Ok, what would you like to hear about?")
+        else:
+            msg = "Okay, Thank you"
+            return statement(msg)
+    elif (session.attributes['state'] == 4):
+        session.attributes['state'] = 2
+        read_article(topicResponse.lower())
+        
             
 def cutWord(sentence):
     fillers = ["um", "uh", "like", "hi", "hey", "hello", "oh", "ok", "okay"]
@@ -172,9 +155,10 @@ def read_article(number):
     msg = format(feeds)
     blank = msg.strip()
     if(len(blank) < 13):
-        return "Sorry, there was no summary, would you like to hear about another topic?"
-    return ","+msg + ", would you like to hear about another topic?"
+        return "Sorry, there was no summary, Do you want to hear about another topic?"
+    return ","+msg + ", Do you want to hear about another topic?"
 
 if __name__ == '__main__':
     app.run(debug=True)
     
+
